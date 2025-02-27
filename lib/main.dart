@@ -1,3 +1,4 @@
+import 'widgets/grocery_list.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,12 +11,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: null,
+      theme: ThemeData.dark().copyWith(
+          colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.dark,
+            seedColor: Colors.deepPurple,
+            surface:  Colors.black,
+          ),
+          scaffoldBackgroundColor: const Color.fromARGB(255, 12, 4, 103)),
+      home: const GroceryList(),
     );
   }
 }
