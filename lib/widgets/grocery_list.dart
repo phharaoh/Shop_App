@@ -16,7 +16,7 @@ class GroceryList extends StatelessWidget {
           IconButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>  NewItem(),
+                  builder: (context) =>  const NewItem(),
                 ));
               },
               icon: const Icon(Icons.add))

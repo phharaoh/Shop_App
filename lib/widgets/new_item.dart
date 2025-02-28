@@ -1,10 +1,23 @@
+import 'dart:developer';
 import '../data/categories.dart';
+import '../models/category.dart';
 import 'package:flutter/material.dart';
 
-class NewItem extends StatelessWidget {
-  NewItem({super.key});
+class NewItem extends StatefulWidget {
+  const NewItem({super.key});
 
+  @override
+  State<NewItem> createState() => _NewItemState();
+}
+
+class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
+
+  var _entredName = '';
+
+  var _entredQuantety = 0;
+
+  Category _selectedCategory = categories[Categories.fruit]!;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +35,9 @@ class NewItem extends StatelessWidget {
                 decoration: const InputDecoration(
                   labelText: 'Name',
                 ),
+                onSaved: (newValue) {
+                  _entredName = newValue!;
+                },
                 keyboardType: TextInputType.number,
                 maxLength: 500,
                 validator: (String? value) {
@@ -33,8 +49,6 @@ class NewItem extends StatelessWidget {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-
-                // space here !!!!!
                 children: [
                   Expanded(
                     child: TextFormField(
@@ -42,6 +56,9 @@ class NewItem extends StatelessWidget {
                       decoration: const InputDecoration(
                         labelText: 'Quantity',
                       ),
+                      onSaved: (newValue) {
+                        _entredQuantety = int.parse(newValue!);
+                      },
                       validator: (String? value) {
                         if (int.tryParse(value!) == null ||
                             int.tryParse(value)! <= 0) {
@@ -55,22 +72,31 @@ class NewItem extends StatelessWidget {
                     width: 10,
                   ),
                   Expanded(
-                      child: DropdownButtonFormField(items: [
-                    for (final category in categories.entries)
-                      DropdownMenuItem(
-                          value: category.value,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 16,
-                                height: 16,
-                                color: category.value.color,
+                    child: DropdownButtonFormField(
+                      value: _selectedCategory,
+                        items: [
+                          for (final category in categories.entries)
+                            DropdownMenuItem(
+                              value: category.value,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 16,
+                                    height: 16,
+                                    color: category.value.color,
+                                  ),
+                                  Text(category.value.title),
+                                ],
                               ),
-                              Text(category.value.title),
-                            ],
-                          ))
-                  ], onChanged: (value) {}))
+                            )
+                        ],
+                        onChanged: (Category? value) {
+                          setState(() {
+                            _selectedCategory == value!;
+                          });
+                        }),
+                  )
                 ],
               ),
               const SizedBox(
@@ -87,7 +113,12 @@ class NewItem extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      _formKey.currentState!.validate();
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        log(_entredName);
+                        log(_entredQuantety.toString());
+                        log(_selectedCategory.toString());
+                      }
                     },
                     child: const Text("Add Item"),
                   )
