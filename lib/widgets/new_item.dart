@@ -1,7 +1,8 @@
-import 'dart:developer';
 import '../data/categories.dart';
 import '../models/category.dart';
+import '../models/grocery_item.dart';
 import 'package:flutter/material.dart';
+
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -17,7 +18,7 @@ class _NewItemState extends State<NewItem> {
 
   var _entredQuantety = 0;
 
-  Category _selectedCategory = categories[Categories.fruit]!;
+  final Category _selectedCategory = categories[Categories.fruit]!;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,7 @@ class _NewItemState extends State<NewItem> {
                   ),
                   Expanded(
                     child: DropdownButtonFormField(
-                      value: _selectedCategory,
+                        value: _selectedCategory,
                         items: [
                           for (final category in categories.entries)
                             DropdownMenuItem(
@@ -115,9 +116,13 @@ class _NewItemState extends State<NewItem> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        log(_entredName);
-                        log(_entredQuantety.toString());
-                        log(_selectedCategory.toString());
+                        Navigator.of(context).pop(
+                          GroceryItem(
+                              id: DateTime.now().toString(),
+                              name: _entredName,
+                              quantity: _entredQuantety,
+                              category: _selectedCategory),
+                        );
                       }
                     },
                     child: const Text("Add Item"),
