@@ -1,4 +1,5 @@
 import 'new_item.dart';
+import 'dart:developer';
 import '../models/grocery_item.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,20 @@ class GroceryList extends StatefulWidget {
 
 class _GroceryListState extends State<GroceryList> {
   final List<GroceryItem> _groceryItems = [];
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    final url = Uri.https('fir-data-base-e046f-default-rtdb.firebaseio.com',
+        'shopping-list.json');
+
+    final http.Response res = await http.get(url);
+
+    log(res.body);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,17 +66,12 @@ class _GroceryListState extends State<GroceryList> {
           title: const Text("My Grocery"),
           actions: [
             IconButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(
+                onPressed: () async {
+                  await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const NewItem(),
-                  ))
-                      .then((value) {
-                    if (value == null) return;
-                    setState(() {
-                      _groceryItems.add(value);
-                    });
-                  });
+                  ));
+
+                  loadData();
                 },
                 icon: const Icon(Icons.add))
           ],

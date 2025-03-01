@@ -1,8 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
 import '../data/categories.dart';
 import '../models/category.dart';
-import '../models/grocery_item.dart';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -113,16 +114,31 @@ class _NewItemState extends State<NewItem> {
                     child: const Text("Reset"),
                   ),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        Navigator.of(context).pop(
-                          GroceryItem(
-                              id: DateTime.now().toString(),
-                              name: _entredName,
-                              quantity: _entredQuantety,
-                              category: _selectedCategory),
+
+                        final url = Uri.https(
+                            'fir-data-base-e046f-default-rtdb.firebaseio.com',
+                            'shopping-list.json');
+
+                        final http.Response res = await http.post(
+                          url,
+                          headers: {'Content-Type': 'application/json'},
+                          body: json.encode(
+                            {
+                              'name': _entredName,
+                              'quantity': _entredQuantety,
+                              'category': _selectedCategory.title
+                            },
+                          ),
                         );
+                        log(res.body);
+                        log(res.statusCode.toString());
+
+                        if (res.statusCode == 200) {
+                          Navigator.of(context).pop();
+                        }
                       }
                     },
                     child: const Text("Add Item"),
