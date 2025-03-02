@@ -140,6 +140,7 @@ class _NewItemState extends State<NewItem> {
                           Navigator.of(context).pop();
                         }
                       }
+
                     },
                     child: const Text("Add Item"),
                   )

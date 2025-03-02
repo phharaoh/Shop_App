@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'new_item.dart';
-import 'dart:developer';
 import '../models/grocery_item.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop_app/data/categories.dart';
+import 'package:shop_app/models/category.dart';
 
 class GroceryList extends StatefulWidget {
   const GroceryList({super.key});
@@ -12,7 +14,7 @@ class GroceryList extends StatefulWidget {
 }
 
 class _GroceryListState extends State<GroceryList> {
-  final List<GroceryItem> _groceryItems = [];
+  List<GroceryItem> _groceryItems = [];
   @override
   void initState() {
     super.initState();
@@ -25,7 +27,25 @@ class _GroceryListState extends State<GroceryList> {
 
     final http.Response res = await http.get(url);
 
-    log(res.body);
+    final Map<String, dynamic> loadedData = json.decode(res.body);
+
+    final List<GroceryItem> _loadedItem = [];
+
+    for (var item in loadedData.entries) {
+      final Category category = categories.entries
+          .firstWhere(
+              (element) => element.value.title == item.value['category'])
+          .value;
+      _loadedItem.add(GroceryItem(
+          id: item.key,
+          name: item.value['name'],
+          quantity: item.value['quantity'],
+          category: category));
+    }
+
+    setState(() {
+      _groceryItems = _loadedItem;
+    });
   }
 
   @override
