@@ -137,6 +137,7 @@ class _NewItemState extends State<NewItem> {
                         log(res.statusCode.toString());
 
                         if (res.statusCode == 200) {
+                          // ignore: use_build_context_synchronously
                           Navigator.of(context).pop();
                         }
                       }
