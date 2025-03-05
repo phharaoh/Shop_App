@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'new_item.dart';
+import 'dart:developer';
+import '../data/categories.dart';
+import '../models/category.dart';
 import '../models/grocery_item.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shop_app/data/categories.dart';
-import 'package:shop_app/models/category.dart';
 
 class GroceryList extends StatefulWidget {
   const GroceryList({super.key});
@@ -25,27 +26,37 @@ class _GroceryListState extends State<GroceryList> {
     final url = Uri.https('fir-data-base-e046f-default-rtdb.firebaseio.com',
         'shopping-list.json');
 
-    final http.Response res = await http.get(url);
+    try {
+      final http.Response res = await http.get(url);
 
-    final Map<String, dynamic> loadedData = json.decode(res.body);
+      if (res.statusCode == 200) {
+        final Map<String, dynamic> loadedData = json.decode(res.body);
 
-    final List<GroceryItem> loadedItem = [];
+        final List<GroceryItem> loadedItem = [];
 
-    for (var item in loadedData.entries) {
-      final Category category = categories.entries
-          .firstWhere(
-              (element) => element.value.title == item.value['category'])
-          .value;
-      loadedItem.add(GroceryItem(
-          id: item.key,
-          name: item.value['name'],
-          quantity: item.value['quantity'],
-          category: category));
+        for (var item in loadedData.entries) {
+          final Category category = categories.entries
+              .firstWhere(
+                  (element) => element.value.title == item.value['category'])
+              .value;
+          loadedItem.add(GroceryItem(
+              id: item.key,
+              name: item.value['name'],
+              quantity: item.value['quantity'],
+              category: category));
+        }
+
+        setState(() {
+          _groceryItems = loadedItem;
+        });
+      } else {
+        // Handle non-200 status codes
+        log('Failed to load data: ${res.statusCode}');
+      }
+    } catch (error) {
+      // Handle errors
+      log('Error loading data: $error');
     }
-
-    setState(() {
-      _groceryItems = loadedItem;
-    });
   }
 
   @override
