@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:developer';
 import '../data/categories.dart';
 import '../models/category.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop_app/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -114,7 +114,7 @@ class _NewItemState extends State<NewItem> {
                     child: const Text("Reset"),
                   ),
                   ElevatedButton(
-                    onPressed: () async {
+                    onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
 
@@ -122,7 +122,8 @@ class _NewItemState extends State<NewItem> {
                             'fir-data-base-e046f-default-rtdb.firebaseio.com',
                             'shopping-list.json');
 
-                        final http.Response res = await http.post(
+                        http
+                            .post(
                           url,
                           headers: {'Content-Type': 'application/json'},
                           body: json.encode(
@@ -132,16 +133,22 @@ class _NewItemState extends State<NewItem> {
                               'category': _selectedCategory.title
                             },
                           ),
-                        );
-                        log(res.body);
-                        log(res.statusCode.toString());
-
-                        if (res.statusCode == 200) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
-                        }
+                        )
+                            .then((res) {
+                          final Map<String, dynamic> resDate =
+                              json.decode(res.body);
+                          if (res.statusCode == 200) {
+                            Navigator.of(context).pop(
+                              GroceryItem(
+                                id: resDate['name'],
+                                name: _entredName,
+                                quantity: _entredQuantety,
+                                category: _selectedCategory,
+                              ),
+                            );
+                          }
+                        });
                       }
-
                     },
                     child: const Text("Add Item"),
                   )

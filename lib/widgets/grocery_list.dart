@@ -18,8 +18,9 @@ class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
   @override
   void initState() {
-    super.initState();
     loadData();
+
+    super.initState();
   }
 
   void loadData() async {
@@ -39,11 +40,15 @@ class _GroceryListState extends State<GroceryList> {
               .firstWhere(
                   (element) => element.value.title == item.value['category'])
               .value;
-          loadedItem.add(GroceryItem(
+
+          loadedItem.add(
+            GroceryItem(
               id: item.key,
               name: item.value['name'],
               quantity: item.value['quantity'],
-              category: category));
+              category: category,
+            ),
+          );
         }
 
         setState(() {
@@ -98,11 +103,16 @@ class _GroceryListState extends State<GroceryList> {
           actions: [
             IconButton(
                 onPressed: () async {
-                  await Navigator.of(context).push(MaterialPageRoute(
+                  final newItem =
+                      await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const NewItem(),
                   ));
-
-                  loadData();
+                  if (newItem == null) {
+                    return;
+                  }
+                  setState(() {
+                    _groceryItems.add(newItem);
+                  });
                 },
                 icon: const Icon(Icons.add))
           ],
